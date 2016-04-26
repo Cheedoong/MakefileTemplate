@@ -14,14 +14,16 @@ A Generic Makefile Template for C/C++ Programs
 
 ### Make Target:
 The Makefile provides the following targets to make:
--   $ `make`           compile and link
--   $ `make NODEP=yes` compile and link without generating dependencies
--   $ `make objs`      compile only (no linking)
--   $ `make tags`      create tags for Emacs editor
--   $ `make ctags`     create ctags for VI editor
--   $ `make clean`     clean objects and the executable file
--   $ `make distclean` clean objects, the executable and dependencies
--   $ `make help`      get the usage of the makefile
+```Shell
+   make            # compile and link
+   make NODEP=yes  # compile and link without generating dependencies
+   make objs       # compile only (no linking)
+   make tags       # create tags for Emacs editor
+   make ctags      # create ctags for VI editor
+   make clean      # clean objects and the executable file
+   make distclean  # clean objects, the executable and dependencies
+   make help       # get the usage of the makefile
+```
 
 ## Users
 + Pear (https://pear.hk)
