@@ -4,7 +4,8 @@ A Generic Makefile Template for C/C++ Programs
 ## Description
 
 ### Features:
-* Automatically traverse and list all (code files in) sub-directories, or manually add;
+* Automatically traverses and lists all (code files in) sub-directories, or you manually add;
+* Automatically generates and processes dependencies; 
 * Can hanlde cross-compiling or cross-platform projects (e.g. Linux, MacOS, Windows);
 * Can work with C projects, C++ projects, or mixed;
 * With examples in-file, and flags for high performance with small size of binary.  
@@ -32,8 +33,8 @@ The Makefile provides the following targets to make:
 ```
 
 ## Users
-+ [Pear]: [https://pear.hk]
-+ HKUST (http://www.ust.hk)
++ [Pear] (https://pear.hk)
++ [HKUST] (http://www.ust.hk)
 
 ## Reference & Thanks to
 + https://sourceforge.net/projects/gcmakefile/
