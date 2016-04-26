@@ -1,5 +1,5 @@
 # MakefileTemplate
-A Generic Makefile Template for C/C++ Programs
+A Generic Makefile Template for C/C++ Projects
 
 ## Description
 
@@ -8,13 +8,14 @@ A Generic Makefile Template for C/C++ Programs
 * Automatically generates and processes dependencies; 
 * Can hanlde cross-compiling or cross-platform projects (e.g. Linux, MacOS, Windows);
 * Can work with C projects, C++ projects, or mixed;
-* With examples in-file, and flags for high performance with small size of binary.  
+* With examples in-file, and flags for high performance with small size of binary; 
+* Not only for executable binaries, but also for static & dynamic libraries [to-do].
 
 ### Usage:
 1. Copy the `Makefile` file to your program source code directory.
 2. Customize in the "Customizable Section" only if necessary:
     * to use non-standard C/C++ libraries, set pre-processor or compiler
-      options to `<MY_CFLAGS>` and linker ones to `<MY_LIBS>`
+      options to `<EXTRA_CFLAGS>` and linker ones to `<EXTRA_LIBS>`
     * to search sources in more directories, set to `<SRCDIRS>`
     * to specify your favorite program name, set to `<PROGRAM>`
 3. Type `make` to start building your program.
