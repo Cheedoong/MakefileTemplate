@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Generic Makefile Template for C/C++ Program
+# Generic Makefile Template for C/C++ Projects
 #
 # License: GPL (General Public License)
 # Note:    GPL only applies to this file; you can use this Makefile in non-GPL projects.
@@ -225,8 +225,9 @@ distclean: clean
 
 # Show help.
 help:
-	@echo 'Generic Makefile for C/C++ Programs (gcmakefile) version 0.5'
-	@echo 'Copyright (C) 2007, 2008 whyglinux <whyglinux@hotmail.com>'
+	@echo 'Pear's Generic Makefile for C/C++ Projects'
+	@echo 'Copyright (C) 2016 Pear <service AT pear DOT hk>'
+	@echo 'Copyright (C) 2007, 2008 whyglinux <whyglinux AT hotmail DOT com>'
 	@echo 
 	@echo 'Usage: make [TARGET]'
 	@echo 'TARGETS:'
