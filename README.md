@@ -2,6 +2,7 @@
 A Generic Makefile Template for C/C++ Programs
 
 ## Description
+
 ### Usage:
 + 1. Copy the Makefile to your program directory.
 + 2. Customize in the "Customizable Section" only if necessary:
@@ -11,6 +12,7 @@ A Generic Makefile Template for C/C++ Programs
     * to search sources in more directories, set to <SRCDIRS>
     * to specify your favorite program name, set to <PROGRAM>
 + 3. Type make to start building your program.
+
 ### Make Target:
 The Makefile provides the following targets to make:
 -   $ make           compile and link
