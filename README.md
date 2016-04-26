@@ -4,10 +4,10 @@ A Generic Makefile Template for C/C++ Programs
 ## Description
 
 ### Features:
-1. Automatically traverse and list all (code files in) sub-directories, or manually add;
-2. Can hanlde cross-compiling or cross-platform projects (e.g. Linux, MacOS, Windows);
-3. Can work with C projects, C++ projects, or mixed;
-4. With examples in-file, and flags for high performance with small size of binary.  
+* Automatically traverse and list all (code files in) sub-directories, or manually add;
+* Can hanlde cross-compiling or cross-platform projects (e.g. Linux, MacOS, Windows);
+* Can work with C projects, C++ projects, or mixed;
+* With examples in-file, and flags for high performance with small size of binary.  
 
 ### Usage:
 1. Copy the `Makefile` file to your program source code directory.
@@ -32,7 +32,7 @@ The Makefile provides the following targets to make:
 ```
 
 ## Users
-+ Pear (https://pear.hk)
++ [Pear]: [https://pear.hk]
 + HKUST (http://www.ust.hk)
 
 ## Reference & Thanks to
