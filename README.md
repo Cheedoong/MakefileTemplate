@@ -39,4 +39,4 @@ The Makefile provides the following targets to make:
 ## Reference & Thanks to
 + https://sourceforge.net/projects/gcmakefile/
 + https://github.com/mbcrawfo/GenericMakefile
-+ http://my.oschina.net/taisha/blog/55055
++ http://blog.csdn.net/kevin1078/article/details/7492619
