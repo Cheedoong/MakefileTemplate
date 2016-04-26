@@ -3,14 +3,20 @@ A Generic Makefile Template for C/C++ Programs
 
 ## Description
 
+### Features:
+1. Automatically traverse and list all (code files in) sub-directories, or manually add;
+2. Can hanlde cross-compiling or cross-platform projects (e.g. Linux, MacOS, Windows);
+3. Can work with C projects, C++ projects, or mixed;
+4. With examples in-file, and flags for high performance with small size of binary.  
+
 ### Usage:
-+ 1. Copy the `Makefile` file to your program source code directory.
-+ 2. Customize in the "Customizable Section" only if necessary:
+1. Copy the `Makefile` file to your program source code directory.
+2. Customize in the "Customizable Section" only if necessary:
     * to use non-standard C/C++ libraries, set pre-processor or compiler
       options to `<MY_CFLAGS>` and linker ones to `<MY_LIBS>`
     * to search sources in more directories, set to `<SRCDIRS>`
     * to specify your favorite program name, set to `<PROGRAM>`
-+ 3. Type make to start building your program.
+3. Type `make` to start building your program.
 
 ### Make Target:
 The Makefile provides the following targets to make:
