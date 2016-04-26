@@ -20,32 +20,32 @@
 ##==========================================================================
 
 # The executable file name. Must be specified.
-PROGRAM       = zzz_pear_test
+PROGRAM                = zzz_pear_test
 
 # C and C++ program compilers. Un-comment and specify for cross-compiling if needed. 
-#CC     = gcc
-#CXX    = g++
+#CC                    = gcc
+#CXX                   = g++
 # Un-comment the following line to compile C programs as C++ ones.
-#CC     = $(CXX)
+#CC                    = $(CXX)
 
 # The extra pre-processor and compiler options; applies to both C and C++ compiling as well as LD. 
-EXTRA_CFLAGS  = -fdata-sections -ffunction-sections
+EXTRA_CFLAGS           = -fdata-sections -ffunction-sections
 
 # The extra linker options, e.g. "-lmysqlclient -lz"
-EXTRA_LDFLAGS = 
+EXTRA_LDFLAGS          = 
 
 # Specify the include dirs, e.g. "-I/usr/include/mysql -I./include -I/usr/include -I/usr/local/include".
-INCLUDE   = 
+INCLUDE                = 
 
 # The C Preprocessor options (notice here "CPP" does not mean "C++"; man cpp for more info.). Actually $(INCLUDE) is included. 
-CPPFLAGS  = -Wall
+CPPFLAGS               = -Wall
 
 # The options used in linking as well as in any direct use of ld. 
-LDFLAGS   =
+LDFLAGS                =
 
 # The directories in which source files reside.
 # If not specified, all subdirectories of the current directory will be added recursively. 
-SRCDIRS  := 
+SRCDIRS               := 
 
 # OS specific. 
 EXTRA_CFLAGS_MACOS     = 
@@ -75,7 +75,7 @@ LDFLAGS       += $(LDFLAGS_WINDOWS)
 endif
 
 #Actually $(INCLUDE) is included in $(CPPFLAGS).
-CPPFLAGS += $(INCLUDE)
+CPPFLAGS      += $(INCLUDE)
 
 ## Implicit Section: change the following only when necessary.
 ##==========================================================================
