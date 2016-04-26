@@ -40,3 +40,4 @@ The Makefile provides the following targets to make:
 + https://sourceforge.net/projects/gcmakefile/
 + https://github.com/mbcrawfo/GenericMakefile
 + http://blog.csdn.net/kevin1078/article/details/7492619
++ http://www.digitalpeer.com/blog/example
