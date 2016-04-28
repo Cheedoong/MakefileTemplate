@@ -213,7 +213,7 @@ endif
 
 ifndef NODEP
 ifneq ($(DEPS),)
-  sinclude $(DEPS)
+	sinclude $(DEPS)
 endif
 endif
 
@@ -252,8 +252,8 @@ show:
 	@echo 'SRC_CXX     :' $(SRC_CXX)
 	@echo 'OBJS        :' $(OBJS)
 	@echo 'DEPS        :' $(DEPS)
- 	@echo 'DEPEND      :' $(DEPEND)
- 	@echo 'DEPEND.d    :' $(DEPEND.d)
+	@echo 'DEPEND      :' $(DEPEND)
+	@echo 'DEPEND.d    :' $(DEPEND.d)
 	@echo 'COMPILE.c   :' $(COMPILE.c)
 	@echo 'COMPILE.cxx :' $(COMPILE.cxx)
 	@echo 'link.c      :' $(LINK.c)
