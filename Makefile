@@ -22,33 +22,33 @@
 # The executable file name. Must be specified.
 PROGRAM                = zzz_pear_test
 
-# C and C++ program compilers. Un-comment and specify for cross-compiling if needed. 
+# C and C++ program compilers. Un-comment and specify for cross-compiling if needed.
 #CC                    = gcc
 #CXX                   = g++
 # Un-comment the following line to compile C programs as C++ ones.
 #CC                    = $(CXX)
 
-# The extra pre-processor and compiler options; applies to both C and C++ compiling as well as LD. 
+# The extra pre-processor and compiler options; applies to both C and C++ compiling as well as LD.
 EXTRA_CFLAGS           = -fdata-sections -ffunction-sections
 
 # The extra linker options, e.g. "-lmysqlclient -lz"
-EXTRA_LDFLAGS          = 
+EXTRA_LDFLAGS          =
 
 # Specify the include dirs, e.g. "-I/usr/include/mysql -I./include -I/usr/include -I/usr/local/include".
-INCLUDE                = 
+INCLUDE                =
 
-# The C Preprocessor options (notice here "CPP" does not mean "C++"; man cpp for more info.). Actually $(INCLUDE) is included. 
+# The C Preprocessor options (notice here "CPP" does not mean "C++"; man cpp for more info.). Actually $(INCLUDE) is included.
 CPPFLAGS               = -Wall -Wextra    # helpful for writing better code (behavior-related)
 
-# The options used in linking as well as in any direct use of ld. 
+# The options used in linking as well as in any direct use of ld.
 LDFLAGS                =
 
 # The directories in which source files reside.
-# If not specified, all subdirectories of the current directory will be added recursively. 
-SRCDIRS               := 
+# If not specified, all subdirectories of the current directory will be added recursively.
+SRCDIRS               :=
 
-# OS specific. 
-EXTRA_CFLAGS_MACOS     = 
+# OS specific.
+EXTRA_CFLAGS_MACOS     =
 EXTRA_LDFLAGS_MACOS    = -Wl,-search_paths_first -Wl,-dead_strip -v   # deleting unused code for Pear, for minimal exe size
 LDFLAGS_MACOS          =
 EXTRA_CFLAGS_LINUX     =
@@ -57,21 +57,31 @@ LDFLAGS_LINUX          =
 EXTRA_CFLAGS_WINDOWS   =
 EXTRA_LDFLAGS_WINDOWS  =
 LDFLAGS_WINDOWS        =
+# OS specific binary paths. Change according to your needs.
+# Windows has its own find command, which is incompatible with this makefile.
+# Hence, may need to specify the full path to the find command as a workaround.
+FIND_CMD_MACOS = find
+FIND_CMD_LINUX = find
+FIND_CMD_WINDOWS = find
+# FIND_CMD_WINDOWS = C:\Program Files\Git\usr\bin\find.exe
 
-# Actually process the OS specific flags. 
+# Actually process the OS specific flags.
 UNAME_S  := $(shell uname -s)
 ifeq ($(UNAME_S), Darwin)      # if MacOS
 EXTRA_CFLAGS  += $(EXTRA_CFLAGS_MACOS)
 EXTRA_LDFLAGS += $(EXTRA_LDFLAGS_MACOS)
 LDFLAGS       += $(LDFLAGS_MACOS)
+FIND_CMD       = $(FIND_CMD_MACOS)
 else ifeq ($(UNAME_S), Linux)  # if Linux
 EXTRA_CFLAGS  += $(EXTRA_CFLAGS_LINUX)
 EXTRA_LDFLAGS += $(EXTRA_LDFLAGS_LINUX)
-LDFLAGS       += $(LDFLAGS_LINUX) 
-else                           # Windows, or... need to specify "MINGW" or "CYGWIN" to correctly detect. 
+LDFLAGS       += $(LDFLAGS_LINUX)
+FIND_CMD       = $(FIND_CMD_LINUX)
+else                           # Windows, or... need to specify "MINGW" or "CYGWIN" to correctly detect.
 EXTRA_CFLAGS  += $(EXTRA_CFLAGS_WINDOWS)
 EXTRA_LDFLAGS += $(EXTRA_LDFLAGS_WINDOWS)
 LDFLAGS       += $(LDFLAGS_WINDOWS)
+FIND_CMD       = $(FIND_CMD_WINDOWS)
 endif
 
 #Actually $(INCLUDE) is included in $(CPPFLAGS).
@@ -101,10 +111,15 @@ ETAGSFLAGS =
 CTAGS = ctags
 CTAGSFLAGS =
 
+# Following lines can provide useful info if portability issues occur.
+# $(info [INFO] current shell: $(SHELL))
+# $(info [INFO] current path: $(PATH))
+
 ## Stable Section: usually no need to be changed. But you can add more.
 ##==========================================================================
 ifeq ($(SRCDIRS),)
-	SRCDIRS := $(shell find $(SRCDIRS) -type d)
+	# SRCDIRS := $(shell find $(SRCDIRS) -type d)
+	SRCDIRS := $(shell $(FIND_CMD) $(SRCDIRS) -type d)
 endif
 SOURCES = $(foreach d,$(SRCDIRS),$(wildcard $(addprefix $(d)/*,$(SRCEXTS))))
 HEADERS = $(foreach d,$(SRCDIRS),$(wildcard $(addprefix $(d)/*,$(HDREXTS))))
@@ -228,7 +243,7 @@ help:
 	@echo "Pear's Generic Makefile for C/C++ Projects"
 	@echo 'Copyright (C) 2016 Pear <service AT pear DOT hk>'
 	@echo 'Copyright (C) 2007, 2008 whyglinux <whyglinux AT hotmail DOT com>'
-	@echo 
+	@echo
 	@echo 'Usage: make [TARGET]'
 	@echo 'TARGETS:'
 	@echo '  all       (=make) compile and link.'
@@ -240,7 +255,7 @@ help:
 	@echo '  distclean clean objects, the executable and dependencies.'
 	@echo '  show      show variables (for debug use only).'
 	@echo '  help      print this message.'
-	@echo 
+	@echo
 	@echo 'Report bugs to <whyglinux AT gmail DOT com>.'
 
 # Show variables (for debug use only.)
