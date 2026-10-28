@@ -118,7 +118,7 @@ ifeq ($(origin AR),default)
   AR  := $(CROSS_COMPILE)ar
 endif
 
-CPPFLAGS      += $(INCLUDE)
+override CPPFLAGS += $(INCLUDE)
 EXTRA_LDFLAGS += $(EXTRA_LIBS)
 
 # ---- Source discovery -----------------------------------------------------
@@ -147,8 +147,8 @@ RAW := $(sort $(filter-out $(EXCLUDE_PATTERNS),$(patsubst ./%,%,$(RAW))))
 SOURCES := $(sort $(filter $(addprefix %,$(SRCEXTS)),$(RAW)))
 HEADERS := $(sort $(filter $(addprefix %,$(HDREXTS)),$(RAW)))
 
-CPPFLAGS += $(addprefix -I,$(SCAN_DIRS))
-CPPFLAGS += $(addprefix -I,$(wildcard libs/*/include))
+override CPPFLAGS += $(addprefix -I,$(sort $(SCAN_DIRS) $(dir $(HEADERS))))
+override CPPFLAGS += $(addprefix -I,$(wildcard libs/*/include))
 LDFLAGS  += $(addprefix -L,$(wildcard libs/*/lib))
 
 SRC_CXX := $(filter-out %.c,$(SOURCES))
@@ -202,8 +202,10 @@ ifeq ($(words $(MAIN_SRCS)),1)
 else
   EXE_NAMES := $(foreach s,$(MAIN_SRCS),$(call EXE_NAME_FOR,$(s)))
 endif
-ifneq ($(words $(EXE_NAMES)),$(words $(sort $(EXE_NAMES))))
-  $(error Executable name collision after path flattening: $(EXE_NAMES). Set MAIN_SRCS=... or rename directories. To clean manually, remove the generated binaries.)
+ifeq ($(TYPE),exe)
+  ifneq ($(words $(EXE_NAMES)),$(words $(sort $(EXE_NAMES))))
+    $(error Executable name collision after path flattening: $(EXE_NAMES). Set MAIN_SRCS=... or rename directories. To clean, run 'make TYPE=static clean' or remove the binaries manually.)
+  endif
 endif
 EXES := $(addsuffix $(EXE_SUFFIX),$(EXE_NAMES))
 
@@ -306,9 +308,9 @@ endif
 
 ALL_PRODUCTS := $(EXES) lib$(PROGRAM).a $(SHARED_PREFIX)$(PROGRAM)$(SHARED_SUFFIX) lib$(PROGRAM).dll.a
 clean:
-	$(Q)$(RM) $(OBJS) $(ALL_PRODUCTS)
+	$(Q)$(RM) $(OBJS) $(ALL_PRODUCTS) $(DEPS)
 distclean: clean
-	$(Q)$(RM) $(DEPS) TAGS tags
+	$(Q)$(RM) TAGS tags
 
 help:
 	@echo "Generic Makefile for C/C++ Projects (v0.8)"
@@ -317,8 +319,8 @@ help:
 	@echo "  objs      compile only"
 	@echo "  run       run executable (lists choices if multiple)"
 	@echo "  tags/ctags create editor tags"
-	@echo "  clean     remove objects and products"
-	@echo "  distclean remove objects, products, deps and tags"
+	@echo "  clean     remove objects, products and deps"
+	@echo "  distclean clean plus editor tags"
 	@echo "  show      print effective variables"
 	@echo "  help      this message"
 	@echo "Vars: TYPE=auto|exe|static|shared  MAIN_SRCS=...  SRCDIRS=..."
@@ -334,7 +336,7 @@ show:
 	@echo 'TYPE         :' $(TYPE)
 	@echo 'PROGRAM      :' $(PROGRAM)
 	@echo 'MAIN_SRCS    :' $(MAIN_SRCS)
-	@echo 'EXES         :' $(EXES)
+	@echo 'EXES         :' $(if $(filter exe,$(TYPE)),$(EXES),)
 	@echo 'LIB          :' $(LIB)
 	@echo 'SRCDIRS      :' $(SCAN_DIRS)
 	@echo 'SOURCES      :' $(SOURCES)
