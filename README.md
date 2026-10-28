@@ -239,9 +239,10 @@ at parse time, still need `INCLUDE`.
 ## Known limitations
 
 * `main()` detection is a heuristic. A `main` inside a multi-line block comment,
-  an `#if 0` block, a declaration or a string may be misdetected. Set `TYPE=`
-  or `MAIN_SRCS=` explicitly when that happens. A false positive fails loudly
-  at link time; it never silently produces the wrong product type.
+  an `#if 0` block, a declaration or a string may be misdetected. A false
+  positive normally fails loudly when linking an executable, but a
+  `TYPE=static`/`shared` build still excludes detected entry points and can
+  therefore omit an object; check `nm` if a library symbol disappears.
 * All non-entry objects are shared by all executables. Keep common code in
   files without `main()`. Two independent programs with same-named symbols
   should be separate projects.

@@ -140,6 +140,9 @@ This stays a small, predictable template rather than a build system:
   ccache, package-manager integration, out-of-tree build directories,
   paths with spaces.
 - Multi-architecture matrices and generated sources.
+- `TYPE=static`/`shared` still excludes sources detected as entry points; a
+  false-positive `main` can omit an object from the library. T13 currently
+  checks the library exists, not every symbol; planned follow-up.
 
 ## Checklist
 
