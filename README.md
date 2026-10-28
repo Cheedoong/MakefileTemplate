@@ -175,7 +175,7 @@ or override `CC` / `CXX` directly.
 The template needs a POSIX shell for `sh`, `rm`, `grep` and friends:
 
 * Install **Git for Windows** or **MSYS2**;
-* Put its `usr\bin` (Git) or `usr\bin` (MSYS2) on `PATH`;
+* Put its `usr\bin` (Git) or `usr\bin` + `ucrt64\bin` (MSYS2) on `PATH`;
 * Use GNU `make` (Git Bash/MSYS2 both provide it).
 
 PowerShell example:
