@@ -1,0 +1,28 @@
+# Build products
+*.o
+*.d
+*.a
+*.so
+*.so.*
+*.dylib
+*.dll
+*.dll.a
+*.exe
+
+# Editor tags
+TAGS
+tags
+
+# Local build directories (not used by the template itself)
+build/
+bin/
+out/
+obj/
+
+# Editors / IDEs
+.vscode/
+.idea/
+
+# Python
+__pycache__/
+*.py[cod]
