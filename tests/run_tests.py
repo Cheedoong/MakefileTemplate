@@ -468,9 +468,14 @@ def t22_exe_ldflags_strip():
         ok(make(d, *args, env=program_env()), "T22 build")
         before = exe_path(d).stat().st_size
         ok(make(d, *args, "clean", env=program_env()), "T22 clean")
-        ok(make(d, *args, "EXE_LDFLAGS=-s", env=program_env()), "T22 strip build")
+        p = make(d, *args, "EXE_LDFLAGS=-s", "V=1", env=program_env())
+        ok(p, "T22 strip build")
+        out = both(p)
+        check("-s" in out, f"EXE_LDFLAGS=-s was not passed to the linker:\n{out}")
         after = exe_path(d).stat().st_size
-        check(after < before, f"EXE_LDFLAGS=-s did not shrink the executable: {before} -> {after}")
+        if not IS_MAC:
+            # ld64 may keep the Mach-O file size unchanged; size is not a portable assertion there.
+            check(after < before, f"EXE_LDFLAGS=-s did not shrink the executable: {before} -> {after}")
     finally:
         cleanup(d)
 
