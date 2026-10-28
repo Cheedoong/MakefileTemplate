@@ -158,8 +158,10 @@ def t01_c_exe():
 def t02_cpp_multi_header():
     d = prepare("cpp-multi")
     try:
-        args = ("PROGRAM=demo", "SRCDIRS=. src", "CPPFLAGS=-I./inc")
+        args = ("PROGRAM=demo", "SRCDIRS=. src", "CPPFLAGS=-DT02")
         ok(make(d, *args, env=program_env()), "T02 build")
+        show = make(d, *args, "show", env=program_env()).stdout
+        check("-Iinc" in show, f"auto header directory missing from CPPFLAGS:\n{show}")
         files = ("main.o", "src/util.o", "src/other.o")
         before = {f: (d / f).stat().st_mtime_ns for f in files}
         time.sleep(1.2)
@@ -275,10 +277,15 @@ def t10_clean_distclean():
         ok(make(d, *args, env=program_env()), "T10 build")
         ok(make(d, *args, "clean", env=program_env()), "T10 clean")
         check(not (d / "main.o").exists() and not exe_path(d).exists(), "clean left objects/products")
-        check(any(d.glob("*.d")), "clean should leave dependency files (distclean removes them)")
+        check(not any(d.rglob("*.d")), "clean left dependency files")
+        ok(make(d, *args, "distclean", env=program_env()), "T10 distclean after clean")
+        check(not any(d.rglob("*.d")), "distclean after clean left dependency files")
         ok(make(d, *args, env=program_env()), "T10 rebuild")
+        (d / "TAGS").write_text("x")
+        (d / "tags").write_text("x")
         ok(make(d, *args, "distclean", env=program_env()), "T10 distclean")
-        check(not any(d.glob("*.d")), "distclean left dependency files")
+        check(not any(d.rglob("*.d")), "distclean left dependency files")
+        check(not (d / "TAGS").exists() and not (d / "tags").exists(), "distclean left tags")
     finally:
         cleanup(d)
 
@@ -414,9 +421,16 @@ def t18_collision_names():
     try:
         write(d / "a_b/main.c", "int main(void){ return 0; }\n")
         write(d / "a/b/main.c", "int main(void){ return 0; }\n")
-        p = make(d, "PROGRAM=demo", env=program_env())
-        check(p.returncode != 0, "residual collision should fail")
+        write(d / "src/common.c", "int common(void){ return 0; }\n")
+        ok(make(d, "PROGRAM=demo", "TYPE=static", env=program_env()),
+           "T18 TYPE=static should ignore residual exe-name collision")
+        check((d / "libdemo.a").exists(), "T18 TYPE=static did not produce a library")
+        p = make(d, "PROGRAM=demo", "TYPE=exe", env=program_env())
+        check(p.returncode != 0, "residual collision should fail for TYPE=exe")
         check("MAIN_SRCS" in both(p), f"residual collision message lacks MAIN_SRCS:\n{both(p)}")
+        ok(make(d, "PROGRAM=demo", "TYPE=static", "clean", env=program_env()),
+           "T18 TYPE=static clean after residual collision")
+        check(not (d / "libdemo.a").exists(), "T18 clean left the static library")
     finally:
         cleanup(d)
 
