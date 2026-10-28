@@ -169,11 +169,55 @@ def p4_c_lib_cpp_app():
         rt.cleanup(d)
 
 
+def p5_shared_lib_and_app():
+    d = fresh()
+    try:
+        src = copy_project("shared-lib-and-app")
+        shutil.copytree(src / "mathlib", d / "lib", dirs_exist_ok=True)
+        shutil.copytree(src / "app", d / "app", dirs_exist_ok=True)
+        add_makefile(d / "lib")
+        add_makefile(d / "app")
+
+        rt.ok(make(d / "lib", "PROGRAM=math", "TYPE=shared", "SRCDIRS=src", "INCLUDE=-Iinclude"),
+              "P5 build shared library")
+
+        (d / "app/libs/math/include").mkdir(parents=True, exist_ok=True)
+        (d / "app/libs/math/lib").mkdir(parents=True, exist_ok=True)
+        shutil.copy2(d / "lib/include/math.h", d / "app/libs/math/include/math.h")
+
+        if rt.IS_WIN:
+            dll = d / "lib" / "math.dll"
+            implib = d / "lib" / "libmath.dll.a"
+            rt.check(dll.exists(), "P5 math.dll missing")
+            rt.check(implib.exists(), "P5 import library missing")
+            shutil.copy2(implib, d / "app/libs/math/lib/libmath.dll.a")
+            shutil.copy2(dll, d / "app/math.dll")
+        else:
+            name = "libmath.dylib" if rt.IS_MAC else "libmath.so"
+            lib = d / "lib" / name
+            rt.check(lib.exists(), f"P5 {name} missing")
+            shutil.copy2(lib, d / "app/libs/math/lib" / name)
+
+        rt.ok(make(d / "app", "PROGRAM=app", "EXTRA_LIBS=-lmath"), "P5 build consumer app")
+        env = rt.program_env()
+        if not rt.IS_WIN:
+            key = "DYLD_LIBRARY_PATH" if rt.IS_MAC else "LD_LIBRARY_PATH"
+            old = env.get(key, "")
+            path = str(d / "app/libs/math/lib")
+            env[key] = path + (os.pathsep + old if old else "")
+        r = rt.run([exe(d / "app", "app")], d / "app", env=env)
+        rt.check(r.returncode == 0, f"P5 app failed to run:\n{r.stderr}")
+        rt.check(r.stdout.strip() == "42", f"P5 unexpected output: {r.stdout!r}")
+    finally:
+        rt.cleanup(d)
+
+
 CASES = [
     ("P1 cli-app (C, include tree + local lib)", p1_cli_app),
     ("P2 multi-tool (C++, two entry points)", p2_multi_tool),
     ("P3 static library + consumer app", p3_static_lib_and_app),
     ("P4 C library + C++ app", p4_c_lib_cpp_app),
+    ("P5 shared library + consumer app", p5_shared_lib_and_app),
 ]
 
 

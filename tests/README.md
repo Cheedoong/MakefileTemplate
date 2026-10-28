@@ -103,3 +103,6 @@ The script prints `PASS` / `FAIL` / `SKIP` per case and exits non-zero on failur
 | T17 | Symbolic-link loop (POSIX only) |
 | T18 | Collision renaming + residual-collision error |
 | T19 | Depth-limit warning |
+| T20 | `MAIN_SRCS=` explicit entry-point override |
+| T21 | `CC=$(CXX)` (compile C as C++) |
+| T22 | `EXE_LDFLAGS=-s` shrinks the executable |

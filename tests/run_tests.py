@@ -436,6 +436,45 @@ def t19_depth_warning():
         cleanup(d)
 
 
+def t20_main_srcs_override():
+    d = prepare()
+    try:
+        write(d / "weird.c", "int helper(void){ return 1; }\nint main(void){ return 0; }\n")
+        write(d / "more.c", "int more(void){ return 2; }\n")
+        ok(make(d, "PROGRAM=demo", "MAIN_SRCS=weird.c", env=program_env()), "T20 build")
+        check(exe_path(d).exists(), "MAIN_SRCS override did not produce an executable")
+    finally:
+        cleanup(d)
+
+
+def t21_cc_as_cxx():
+    d = prepare("c-exe")
+    try:
+        args = ("PROGRAM=demo", "SRCDIRS=. src", "CPPFLAGS=-I./inc",
+                f"CC={CXX}", f"CXX={CXX}", "V=1")
+        p = make(d, *args, env=program_env())
+        ok(p, "T21 build")
+        out = both(p)
+        check(re.search(rf"{re.escape(CXX)} .*main\.c", out), f"main.c was not compiled as C++:\n{out}")
+        check(re.search(rf"{re.escape(CXX)} .*demo", out), f"link did not use {CXX}:\n{out}")
+    finally:
+        cleanup(d)
+
+
+def t22_exe_ldflags_strip():
+    d = prepare("c-exe")
+    try:
+        args = ("PROGRAM=demo", "SRCDIRS=. src", "CPPFLAGS=-I./inc")
+        ok(make(d, *args, env=program_env()), "T22 build")
+        before = exe_path(d).stat().st_size
+        ok(make(d, *args, "clean", env=program_env()), "T22 clean")
+        ok(make(d, *args, "EXE_LDFLAGS=-s", env=program_env()), "T22 strip build")
+        after = exe_path(d).stat().st_size
+        check(after < before, f"EXE_LDFLAGS=-s did not shrink the executable: {before} -> {after}")
+    finally:
+        cleanup(d)
+
+
 CASES = [
     ("T01 C exe", t01_c_exe),
     ("T02 C++ multi-dir + header change", t02_cpp_multi_header),
@@ -456,6 +495,9 @@ CASES = [
     ("T17 symlink loop", t17_symlink_loop),
     ("T18 collision names", t18_collision_names),
     ("T19 depth warning", t19_depth_warning),
+    ("T20 MAIN_SRCS override", t20_main_srcs_override),
+    ("T21 CC=$(CXX)", t21_cc_as_cxx),
+    ("T22 EXE_LDFLAGS strip", t22_exe_ldflags_strip),
 ]
 
 

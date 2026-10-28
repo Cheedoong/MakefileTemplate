@@ -18,11 +18,12 @@ the template under test. Nothing here is installed or left in the repository.
 | `multi-tool` | C++, `src/common/`, `tools/alpha.cpp`, `tools/beta.cpp` | multiple entry points, shared common objects compiled once, `make run` |
 | `static-lib-and-app` | C library project + consumer app | `TYPE=static`, symbols in `libmath.a`, `libs/<name>/{include,lib}` consumption |
 | `c-lib-cpp-app` | C library + C++ app (`extern "C"`) | mixed-language boundary, `gcc` for the library, `g++` for the app/link |
+| `shared-lib-and-app` | shared library + consumer app | runtime loading (`LD_LIBRARY_PATH` / `DYLD_LIBRARY_PATH` / DLL next to the exe) |
 
 Expected result:
 
 ```
-summary: 4 passed, 0 failed
+summary: 5 passed, 0 failed
 ```
 
 On Windows the executables get `.exe`; the runner handles that automatically.
