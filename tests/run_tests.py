@@ -370,7 +370,7 @@ def t16_empty_and_no_shell():
     finally:
         cleanup(d)
     if not IS_WIN:
-        raise SkipTest("no-shell preflight is Windows-specific")
+        return
     d = prepare()
     try:
         write(d / "main.c", "int main(void){ return 0; }\n")
