@@ -68,6 +68,7 @@ The script prints `PASS` / `FAIL` / `SKIP` per case and exits non-zero on failur
       `No source files found` and `Nothing to be done`.
 - [ ] Copy only `Makefile` into a new directory with one `main.c`; `make` builds and runs.
 - [ ] Touch a header: only objects that include it are recompiled.
+- [ ] Header in `inc/` with no `CPPFLAGS`/`INCLUDE`: `make` works and `make show` contains `-Iinc`.
 - [ ] Delete a header: `make` fails with a readable compiler error; `make clean` still works.
 - [ ] `make TYPE=static`: `lib<PROGRAM>.a` exists and `nm` shows the symbol.
 - [ ] `make TYPE=shared`: `lib<PROGRAM>.so` (or `.dylib`) exists; `nm -D` / `nm -g` shows the symbol.
@@ -76,6 +77,9 @@ The script prints `PASS` / `FAIL` / `SKIP` per case and exits non-zero on failur
 - [ ] `make EXE_LDFLAGS=-s` produces a smaller executable (release strip).
 - [ ] Collision: `main.cpp`, `sub/main.cpp`, `a/x/main.cpp`, `b/x/main.cpp`
       produce `main`, `sub_main`, `a_x_main`, `b_x_main`; `make clean` works.
+- [ ] Residual collision: `a_b/main.c` + `a/b/main.c` fails for `TYPE=exe`,
+      but `make TYPE=static` builds a library.
+- [ ] `make clean` removes `.d`; `make distclean` also removes `TAGS`/`tags`.
 - [ ] Symlink loop (Linux/macOS): `ln -s .. loop` does not duplicate sources.
 - [ ] 9-level directory tree prints a `depth limit` warning instead of silently
       dropping files.
@@ -85,7 +89,7 @@ The script prints `PASS` / `FAIL` / `SKIP` per case and exits non-zero on failur
 | Case | Coverage |
 |---|---|
 | T01 | C executable, multi-directory, incremental no-op, duplicate-source guard |
-| T02 | C++ multi-directory; header change recompiles only affected objects |
+| T02 | C++ multi-directory; auto header `-I`; header change recompiles only affected objects |
 | T03 | Compile failure then fix without deleting `.d` |
 | T04 | Deleted header; `clean` remains usable |
 | T05 | Static library and symbols |
@@ -93,7 +97,7 @@ The script prints `PASS` / `FAIL` / `SKIP` per case and exits non-zero on failur
 | T07 | `TYPE=auto` chooses executable vs library |
 | T08 | Mixed C/C++; `.c` vs `.C` compiler selection |
 | T09 | `make -j8` |
-| T10 | `clean` vs `distclean` |
+| T10 | `clean` removes `.d`; `distclean` removes tags |
 | T11 | Multiple `main()`; common objects compiled once |
 | T12 | Single-main naming (`PROGRAM`) |
 | T13 | Commented-out `main` does not silently produce a wrong product |
@@ -101,7 +105,7 @@ The script prints `PASS` / `FAIL` / `SKIP` per case and exits non-zero on failur
 | T15 | `libs/<name>/{include,lib}` auto-discovery |
 | T16 | Empty project does not hang; Windows missing-shell preflight |
 | T17 | Symbolic-link loop (POSIX only) |
-| T18 | Collision renaming + residual-collision error |
+| T18 | Collision renaming; residual collision fails for exe, not static lib |
 | T19 | Depth-limit warning |
 | T20 | `MAIN_SRCS=` explicit entry-point override |
 | T21 | `CC=$(CXX)` (compile C as C++) |

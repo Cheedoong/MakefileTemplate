@@ -8,7 +8,7 @@ completes the long-standing `[to-do]` (static/shared libraries), and adds
 multi-entry-point support. `tags`/`ctags`, the old variable names and the
 OS-specific flag hooks are preserved.
 
-The template is still a single `Makefile` (358 lines, 278 of them code).
+The template is still a single `Makefile` (360 lines, 280 of them code).
 `tests/` and `.github/` are maintenance infrastructure, not part of what users copy.
 
 ## Problems reproduced before the change
@@ -24,6 +24,7 @@ The template is still a single `Makefile` (358 lines, 278 of them code).
 | 7 | Shell preflight using `echo` passes under `cmd.exe`, then `rm` fails | `check=[__ok__]`, then `CreateProcess(NULL, rm ...) failed` |
 | 8 | A parse-time collision error also blocks `make clean` / `make help` | `make clean` aborts with the collision message |
 | 9 | README documents `EXTRA_LIBS`, which does not exist (issue #1) | variable absent from 0.7 |
+| 10 | Header in a subdirectory (`inc/util.h`) needs a manual `-I` | `main.c:1:10: fatal error: util.h: No such file or directory` |
 
 ## Changes
 
@@ -38,6 +39,10 @@ The template is still a single `Makefile` (358 lines, 278 of them code).
 - Symbolic-linked directories are not followed (same as `find -type d`); files
   are still picked up. Exceeding the depth limit (8) prints a warning instead of
   silently dropping files.
+- Every directory containing a discovered header is appended to `CPPFLAGS`
+  (`$(sort $(dir $(HEADERS)))`), so `main.c` + `inc/util.h` works without a
+  manual `-I`. `override` keeps these paths when `CPPFLAGS` is set on the
+  command line; explicit user paths still come first.
 
 ### Platform and compiler detection
 
@@ -57,7 +62,8 @@ The template is still a single `Makefile` (358 lines, 278 of them code).
   `lib<PROGRAM>.dll.a`.
 - One executable per `main()`; common objects are compiled once. Colliding
   stems use the full relative path (`a/x/main.cpp` -> `a_x_main`); the root
-  file has no prefix.
+  file has no prefix. Residual name collisions are rejected only for
+  `TYPE=exe`; `TYPE=static`/`shared` still builds the library.
 - `libs/<name>/{include,lib}` is added to `-I`/`-L` automatically; consumers
   only write `EXTRA_LIBS=-l<name>`.
 
@@ -68,6 +74,8 @@ The template is still a single `Makefile` (358 lines, 278 of them code).
 - `EXE_LDFLAGS` is executable-only; `-s` is opt-in instead of stripping by
   default.
 - `EXTRA_LIBS` is accepted as an alias for the old README.
+- `make clean` removes objects, products and `.d`; `make distclean` additionally
+  removes `TAGS`/`tags`.
 - `tags`/`ctags` and the original OS-specific flag variables are preserved.
 
 ## Compatibility and behavior changes
@@ -81,6 +89,12 @@ The template is still a single `Makefile` (358 lines, 278 of them code).
 - Executables are no longer stripped by default; use `make EXE_LDFLAGS=-s` for
   a release build. Libraries always keep their symbols.
 - The noisy `-v` was removed from the macOS link flags.
+- Header directories are auto-added to `-I`; explicit `CPPFLAGS`/`INCLUDE`
+  paths keep precedence. A project header named like a system header can shadow
+  it.
+- `make clean` now also removes `.d` files (previously `distclean` did).
+- `TYPE=static`/`shared` is no longer blocked by a residual executable-name
+  collision.
 - Windows needs a POSIX shell (Git for Windows or MSYS2) on `PATH`.
 
 All original variables are still accepted:
@@ -107,8 +121,8 @@ Additional checks:
 
 The suite covers C/C++, incremental rebuilds, deleted headers, static/shared
 libraries, `TYPE=auto`, multiple mains, collision naming, `libs/`, empty trees,
-symlink loops, depth limits, `MAIN_SRCS`, `CC=$(CXX)`, `EXE_LDFLAGS=-s` and
-`help`/`show`/`V=1`.
+symlink loops, depth limits, `MAIN_SRCS`, `CC=$(CXX)`, `EXE_LDFLAGS=-s`,
+auto header `-I`, `clean`/`distclean` and `help`/`show`/`V=1`.
 
 ## Related
 

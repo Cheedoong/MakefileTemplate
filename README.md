@@ -13,7 +13,8 @@ make
 
 ## Features
 
-* Automatically scans sub-directories for C/C++ sources, or use `SRCDIRS`;
+* Automatically scans sub-directories for C/C++ sources (or use `SRCDIRS`)
+  and adds header directories to the include path;
 * Correct incremental builds: header dependencies via `-MMD -MP`, no stale `.d` files;
 * C, C++ and mixed projects; all common extensions are supported;
 * Executables, static libraries and shared libraries (`TYPE=auto|exe|static|shared`);
@@ -62,11 +63,11 @@ paths, cross-compiling and `CC=$(CXX)`.
 | `TYPE` | `auto` | `auto`, `exe`, `static` or `shared` |
 | `MAIN_SRCS` | auto-detected | Explicit entry-point sources; skips the scan |
 | `SRCDIRS` | empty (scan `.`) | Source directories; scanning is recursive |
-| `INCLUDE` | empty | Extra `-I` directories |
+| `INCLUDE` | empty | Extra `-I` flags (e.g. `-I./inc`); applied before auto paths |
 | `EXTRA_CFLAGS` | `-fdata-sections -ffunction-sections` | Extra compiler flags |
 | `EXTRA_LDFLAGS` | empty | Extra linker flags |
 | `EXTRA_LIBS` | empty | Compatibility alias for link libraries, e.g. `-lm` |
-| `CPPFLAGS` | empty | Preprocessor flags (the template adds `-I` paths) |
+| `CPPFLAGS` | empty | Preprocessor flags; auto `-I` paths are appended even when set on the command line |
 | `CFLAGS` / `CXXFLAGS` | `-O3` | Compiler flags |
 | `LDFLAGS` | empty | Linker flags |
 | `EXE_LDFLAGS` | empty | Executable-only link flags; `-s` strips a release build |
@@ -85,8 +86,8 @@ paths, cross-compiling and `CC=$(CXX)`.
 | `objs` | Compile only, do not link |
 | `run` | Run the executable (lists choices when there are several) |
 | `tags` / `ctags` | Generate editor tags (`etags` / `ctags` required) |
-| `clean` | Remove objects and products |
-| `distclean` | `clean` plus dependency files and tags |
+| `clean` | Remove objects, dependency files and products |
+| `distclean` | `clean` plus editor tags (`TAGS`/`tags`) |
 | `show` | Print effective variables |
 | `help` | Print usage |
 
@@ -127,6 +128,13 @@ All non-entry objects are shared by every executable and compiled once.
 If two mains have the same stem (`a/x/main.cpp`, `b/x/main.cpp`), the full
 relative path is used (`a_x_main`, `b_x_main`). Root files get no prefix
 (`main.cpp` -> `main`).
+
+A residual collision (two entry points flatten to the same name, e.g.
+`a_b/main.cpp` and `a/b/main.cpp`) is an error only for `TYPE=exe`.
+`TYPE=static`/`shared` ignores the executable names and still builds the
+library. Because the check runs at parse time, the default `make clean` is
+also blocked by such a collision; use `make TYPE=static clean` or remove the
+binaries manually.
 
 ```sh
 make
@@ -205,7 +213,15 @@ is still in effect, so environment/command-line overrides always win.
 * deleting a header gives a normal compiler error, and `make clean` still works;
 * `NODEP=yes` disables both generation and inclusion.
 
-`clean` removes objects/products; `distclean` also removes `.d` files and tags.
+`clean` removes objects, products and `.d` files; `distclean` also removes
+editor tags (`TAGS`/`tags`).
+
+Header directories discovered under the scanned tree are added to `CPPFLAGS`
+automatically. Explicit `CPPFLAGS`/`INCLUDE` paths come first, then the auto
+directories in `$(sort)` order; `#include "x.h"` still searches the including
+file's directory first. Put explicit paths in `INCLUDE` if you need to win a
+name clash. Headers outside `SRCDIRS`, or generated headers that do not exist
+at parse time, still need `INCLUDE`.
 
 ## How it works (short version)
 
@@ -232,6 +248,10 @@ is still in effect, so environment/command-line overrides always win.
 * Symbolic-linked **directories** are not followed (same as the original
   `find -type d`); symbolic-linked **files** work normally. Do not create
   symlink loops on Windows, where `realpath` may not resolve NTFS links.
+* Header auto-discovery adds every header directory under `SRCDIRS`. A
+  same-named project header can shadow a system header, and headers outside
+  the scan (or generated headers) need `INCLUDE`. Explicit `CPPFLAGS`/
+  `INCLUDE` paths take precedence.
 * Paths containing spaces are not supported (same as the original template).
 * No out-of-tree build directory; objects live next to sources.
 * No `compile_commands.json`, `make install`, debug/release presets, ccache or
@@ -245,6 +265,7 @@ is still in effect, so environment/command-line overrides always win.
 | `PROGRAM = zzz_pear_test` | defaults to the directory name |
 | no library support | `TYPE=auto|exe|static|shared` |
 | `src/.foo.d` | `src/foo.d` |
+| `clean` kept `.d` files | `clean` removes them; `distclean` removes tags |
 | `PROGRAM` target on Windows | `<PROGRAM>.exe` (no more relinking every run) |
 | `-Wl,--strip-all` on Linux links | strip only when `EXE_LDFLAGS=-s` |
 | `-v` in macOS link flags | removed (noisy) |
