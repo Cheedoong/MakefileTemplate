@@ -234,6 +234,9 @@ ifeq ($(strip $(OBJS)),)
   TARGETS :=
 else ifeq ($(TYPE),exe)
   TARGETS := $(EXES)
+else ifeq ($(strip $(COMMON_OBJS)),)
+  $(warning TYPE=$(TYPE) but all objects are entry points; nothing to archive)
+  TARGETS :=
 else
   TARGETS := $(LIB)
 endif

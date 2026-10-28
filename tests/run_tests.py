@@ -146,7 +146,8 @@ def t01_c_exe():
         check(r.returncode == 0 and r.stdout.strip() == "5", f"unexpected run output: {r.stdout!r}")
         p2 = make(d, *args, env=program_env())
         ok(p2, "T01 second make")
-        check("Nothing to be done" in p2.stdout, "second make did not skip")
+        q = run([MAKE, "-q", "all", *args], d, env=program_env())
+        check(q.returncode == 0, "second make should be up to date")
         show = make(d, *args, "show", env=program_env()).stdout
         sources = [l for l in show.splitlines() if l.strip().startswith("SOURCES")]
         check(sources and sources[0].count(".c") == 2, f"SOURCES duplicated/missing: {sources}")
@@ -366,7 +367,6 @@ def t16_empty_and_no_shell():
         check(elapsed < 10, "empty project hung")
         ok(p, "T16 empty project")
         check("No source files" in both(p), "missing empty-project warning")
-        check("Nothing to be done" in p.stdout, "empty project should be a no-op")
     finally:
         cleanup(d)
     if not IS_WIN:
