@@ -131,7 +131,7 @@ relative path is used (`a_x_main`, `b_x_main`). Root files get no prefix
 
 A residual collision (two entry points flatten to the same name, e.g.
 `a_b/main.cpp` and `a/b/main.cpp`) is an error only for `TYPE=exe`.
-`TYPE=static`/`shared` ignores the executable names and still builds the
+`TYPE=static`/`shared` ignores the executable names and can still build the
 library. Because the check runs at parse time, the default `make clean` is
 also blocked by such a collision; use `make TYPE=static clean` or remove the
 binaries manually.

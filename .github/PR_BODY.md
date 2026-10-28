@@ -63,7 +63,7 @@ The template is still a single `Makefile` (360 lines, 280 of them code).
 - One executable per `main()`; common objects are compiled once. Colliding
   stems use the full relative path (`a/x/main.cpp` -> `a_x_main`); the root
   file has no prefix. Residual name collisions are rejected only for
-  `TYPE=exe`; `TYPE=static`/`shared` still builds the library.
+  `TYPE=exe`; `TYPE=static`/`shared` can still build the library.
 - `libs/<name>/{include,lib}` is added to `-I`/`-L` automatically; consumers
   only write `EXTRA_LIBS=-l<name>`.
 
