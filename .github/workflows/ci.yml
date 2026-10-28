@@ -26,6 +26,11 @@ jobs:
           CC: ${{ matrix.cc }}
           CXX: ${{ matrix.cxx }}
         run: python3 tests/run_tests.py
+      - name: Run project tests
+        env:
+          CC: ${{ matrix.cc }}
+          CXX: ${{ matrix.cxx }}
+        run: python3 tests/run_projects.py
 
   macos:
     runs-on: macos-latest
@@ -36,6 +41,11 @@ jobs:
           CC: clang
           CXX: clang++
         run: python3 tests/run_tests.py
+      - name: Run project tests
+        env:
+          CC: clang
+          CXX: clang++
+        run: python3 tests/run_projects.py
 
   windows:
     runs-on: windows-latest
@@ -52,3 +62,6 @@ jobs:
       - name: Run tests
         shell: msys2 {0}
         run: python tests/run_tests.py
+      - name: Run project tests
+        shell: msys2 {0}
+        run: python tests/run_projects.py
