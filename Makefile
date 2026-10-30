@@ -168,11 +168,9 @@ MAIN_RE   := ^[[:space:]]*$(MAIN_HINT)
 # Preprocess candidates so comments cannot look like entry points; fall back
 # to raw grep if preprocessing fails, so a real main() is never missed.
 MAIN_CPP = $(if $(filter %.c,$(1)),$(CC),$(CXX))
-MAIN_OK = $(shell if grep -qE '/\*|//|^[[:space:]]*[#][[:space:]]*if' $(1) 2>/dev/null; then \
-  if out=$$($(call MAIN_CPP,$(1)) -E -P $(CPPFLAGS) $(1) 2>/dev/null); then \
-    printf '%s\n' "$$out" | grep -qE '$(MAIN_RE)' && echo yes; \
-  else grep -qE '$(MAIN_RE)' $(1) && echo yes; fi; \
-  else grep -qE '$(MAIN_RE)' $(1) && echo yes; fi)
+MAIN_OK = $(shell { if grep -qE '/\*|//|^[[:space:]]*[#][[:space:]]*if' $(1) 2>/dev/null; then \
+  $(call MAIN_CPP,$(1)) -E -P $(CPPFLAGS) $(1) 2>/dev/null || cat $(1); \
+  else cat $(1); fi; } | grep -qE '$(MAIN_RE)' && echo yes)
 
 ifeq ($(strip $(MAIN_SRCS)),)
   ifneq ($(strip $(SOURCES)),)
