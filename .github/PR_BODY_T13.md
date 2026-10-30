@@ -16,6 +16,9 @@ still excludes `foo.o` from the archive.
 
 ## Changes
 
+The change is local to the entry-point section; the Makefile grows from 360 to
+371 lines (288 code lines).
+
 - Use a broad candidate grep (`MAIN_HINT`, no line anchor) to find files that
   mention `int/void main`.
 - For candidates that contain `//`, `/*`, or `#if`, preprocess only that file
@@ -46,7 +49,9 @@ still excludes `foo.o` from the archive.
 | Ubuntu 24.04 + gcc 13.3 | 22/22 | 5/5 |
 | Ubuntu 24.04 + clang 18.1.3 | 22/22 | 5/5 |
 
-GitHub Actions will run on the branch/PR.
+GitHub Actions on the branch is green:
+https://github.com/OnlyRicardo/MakefileTemplate/actions/runs/41029995019
+(Ubuntu gcc, Ubuntu clang, macOS, Windows).
 
 ## Known limits
 
