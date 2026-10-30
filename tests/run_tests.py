@@ -320,10 +320,28 @@ def t12_single_main_name():
 def t13_main_false_positive():
     d = prepare("main-false-positive")
     try:
-        p = make(d, "PROGRAM=demo", env=program_env())
-        check(p.returncode != 0, "commented-out main should not silently build an executable")
-        ok(make(d, "PROGRAM=demo", "TYPE=static", env=program_env()), "T13 TYPE=static override")
-        check((d / "libdemo.a").exists(), "TYPE=static did not produce a library")
+        ok(make(d, "PROGRAM=demo", env=program_env()), "T13 auto build")
+        lib = shared_path(d)
+        check(lib.exists(), f"TYPE=auto should build a library, missing {lib.name}")
+
+        p = make(d, "PROGRAM=demo", "TYPE=exe", env=program_env())
+        check(p.returncode != 0, "commented-out main should not build an executable")
+
+        ok(make(d, "PROGRAM=demo", "TYPE=static", env=program_env()), "T13 static build")
+        lib = d / "libdemo.a"
+        check(lib.exists(), "TYPE=static did not produce a library")
+        out = both(run(["nm", lib.name], d, env=program_env()))
+        check("foo" in out, "T13 static library is missing the foo symbol")
+        check("main" not in out, "T13 static library unexpectedly contains main")
+    finally:
+        cleanup(d)
+
+    # A real main after a comment must still be detected.
+    d = prepare()
+    try:
+        write(d / "main.c", "/* note */ int main(void) { return 0; }\n")
+        ok(make(d, "PROGRAM=demo", env=program_env()), "T13 inline main build")
+        check(exe_path(d).exists(), "T13 missed a real main after a block comment")
     finally:
         cleanup(d)
 
