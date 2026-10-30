@@ -69,6 +69,7 @@ The script prints `PASS` / `FAIL` / `SKIP` per case and exits non-zero on failur
 - [ ] Copy only `Makefile` into a new directory with one `main.c`; `make` builds and runs.
 - [ ] Touch a header: only objects that include it are recompiled.
 - [ ] Header in `inc/` with no `CPPFLAGS`/`INCLUDE`: `make` works and `make show` contains `-Iinc`.
+- [ ] `// int main`, `/* int main */` and `#if 0` blocks are ignored; `/* note */ int main(...)` still builds an executable.
 - [ ] Delete a header: `make` fails with a readable compiler error; `make clean` still works.
 - [ ] `make TYPE=static`: `lib<PROGRAM>.a` exists and `nm` shows the symbol.
 - [ ] `make TYPE=shared`: `lib<PROGRAM>.so` (or `.dylib`) exists; `nm -D` / `nm -g` shows the symbol.
@@ -100,7 +101,7 @@ The script prints `PASS` / `FAIL` / `SKIP` per case and exits non-zero on failur
 | T10 | `clean` removes `.d`; `distclean` removes tags |
 | T11 | Multiple `main()`; common objects compiled once |
 | T12 | Single-main naming (`PROGRAM`) |
-| T13 | Commented-out `main` does not silently build an executable |
+| T13 | Commented/`#if 0` main is ignored; auto builds a library, explicit exe fails |
 | T14 | `help` / `show` / `V=1` / `objs` / `tags` dry-run |
 | T15 | `libs/<name>/{include,lib}` auto-discovery |
 | T16 | Empty project does not hang; Windows missing-shell preflight |

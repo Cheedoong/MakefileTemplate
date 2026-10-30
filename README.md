@@ -230,7 +230,8 @@ at parse time, still need `INCLUDE`.
 2. One explicit rule is generated per source, choosing `CC` or `CXX` from the
    real file suffix. This also avoids `mingw32-make` matching `%.o: %.C` for
    a `*.c` file on case-insensitive filesystems.
-3. `TYPE=auto` uses a line-anchored `grep` for `int main`/`void main`.
+3. `TYPE=auto` finds candidates with a broad `grep`, then preprocesses files that
+   contain comments or `#if` blocks with `-E -P` before the final line-anchored check.
 4. Static libraries use `ar rcs`; shared libraries use `-shared` (and the
    Windows export/import flags).
 5. Entry points are linked with the common objects; a pure-C project links with
@@ -238,11 +239,10 @@ at parse time, still need `INCLUDE`.
 
 ## Known limitations
 
-* `main()` detection is a heuristic. A `main` inside a multi-line block comment,
-  an `#if 0` block, a declaration or a string may be misdetected. A false
-  positive normally fails loudly when linking an executable, but a
-  `TYPE=static`/`shared` build still excludes detected entry points and can
-  therefore omit an object; check `nm` if a library symbol disappears.
+* `main()` detection is a heuristic. Comments are removed by the compiler
+  before the final check, but a declaration, a string literal or a `main` from
+  an included header may still be misdetected. If preprocessing fails, the raw
+  source is checked as a fallback so a real `main` is not missed.
 * All non-entry objects are shared by all executables. Keep common code in
   files without `main()`. Two independent programs with same-named symbols
   should be separate projects.
