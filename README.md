@@ -264,7 +264,7 @@ at parse time, still need `INCLUDE`.
 | 0.7 | 0.8 |
 |---|---|
 | `PROGRAM = zzz_pear_test` | defaults to the directory name |
-| no library support | `TYPE=auto|exe|static|shared` |
+| no library support | `TYPE=auto\|exe\|static\|shared` |
 | `src/.foo.d` | `src/foo.d` |
 | `clean` kept `.d` files | `clean` removes them; `distclean` removes tags |
 | `PROGRAM` target on Windows | `<PROGRAM>.exe` (no more relinking every run) |
