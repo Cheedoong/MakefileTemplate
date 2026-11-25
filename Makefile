@@ -162,11 +162,22 @@ endif
 DEPS := $(OBJS:.o=.d)
 
 # ---- Target type and entry points -----------------------------------------
-MAIN_RE := ^[[:space:]]*(int|void)[[:space:]]+main[[:space:]]*\(
+MAIN_HINT := (int|void)[[:space:]]+main[[:space:]]*\(
+MAIN_RE   := ^[[:space:]]*$(MAIN_HINT)
+
+# Preprocess candidates so comments cannot look like entry points; fall back
+# to raw grep if preprocessing fails, so a real main() is never missed.
+MAIN_CPP = $(if $(filter %.c,$(1)),$(CC),$(CXX))
+MAIN_OK = $(shell { $(call MAIN_CPP,$(1)) -E -P $(CPPFLAGS) $(1) 2>/dev/null || cat $(1); } | grep -qE '$(MAIN_RE)' && echo yes)
 
 ifeq ($(strip $(MAIN_SRCS)),)
   ifneq ($(strip $(SOURCES)),)
-    MAIN_SRCS := $(strip $(shell grep -lE '$(MAIN_RE)' $(SOURCES) 2>/dev/null))
+    MAIN_CAND := $(strip $(shell grep -lE '$(MAIN_HINT)' $(SOURCES) 2>/dev/null))
+    MAIN_MAYBE := $(if $(strip $(MAIN_CAND)),$(strip $(shell grep -lE '/\*|//|^[[:space:]]*[[:punct:]]if' $(MAIN_CAND) 2>/dev/null)))
+    MAIN_SRCS := $(strip $(foreach f,$(MAIN_CAND),\
+      $(if $(filter $(f),$(MAIN_MAYBE)),\
+        $(if $(call MAIN_OK,$(f)),$(f)),\
+        $(if $(shell grep -qE '$(MAIN_RE)' $(f) 2>/dev/null && echo yes),$(f)))))
   endif
 endif
 
