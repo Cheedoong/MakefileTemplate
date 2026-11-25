@@ -213,9 +213,10 @@ ifeq ($(words $(MAIN_SRCS)),1)
 else
   EXE_NAMES := $(foreach s,$(MAIN_SRCS),$(call EXE_NAME_FOR,$(s)))
 endif
+EXE_COLLISION :=
 ifeq ($(TYPE),exe)
   ifneq ($(words $(EXE_NAMES)),$(words $(sort $(EXE_NAMES))))
-    $(error Executable name collision after path flattening: $(EXE_NAMES). Set MAIN_SRCS=... or rename directories. To clean, run 'make TYPE=static clean' or remove the binaries manually.)
+    EXE_COLLISION := 1
   endif
 endif
 EXES := $(addsuffix $(EXE_SUFFIX),$(EXE_NAMES))
@@ -246,7 +247,7 @@ endif
 ifeq ($(strip $(OBJS)),)
   TARGETS :=
 else ifeq ($(TYPE),exe)
-  TARGETS := $(EXES)
+  TARGETS := $(if $(strip $(EXE_COLLISION)),check-collision,$(EXES))
 else ifeq ($(strip $(COMMON_OBJS)),)
   $(warning TYPE=$(TYPE) but all objects are entry points; nothing to archive)
   TARGETS :=
@@ -263,7 +264,7 @@ LINK.c      = $(CC)  $(EXTRA_CFLAGS) $(CFLAGS)   $(LDFLAGS)
 LINK.cxx    = $(CXX) $(EXTRA_CFLAGS) $(CXXFLAGS) $(LDFLAGS)
 LINK        = $(if $(strip $(SRC_CXX)),$(LINK.cxx),$(LINK.c))
 
-.PHONY: all objs tags ctags clean distclean help show run
+.PHONY: all objs tags ctags clean distclean help show run check-collision
 .DEFAULT_GOAL := all
 .SUFFIXES:
 
@@ -285,7 +286,9 @@ $(call EXE_TARGET,$(1)): $(basename $(1)).o $(COMMON_OBJS)
 	$$(Q)$$(LINK) $$^ $$(EXTRA_LDFLAGS) $$(EXE_LDFLAGS) -o $$@
 	@echo "Built executable $$@"
   endef
-  $(foreach s,$(MAIN_SRCS),$(eval $(call EXE_RULE,$(s))))
+  ifeq ($(strip $(EXE_COLLISION)),)
+    $(foreach s,$(MAIN_SRCS),$(eval $(call EXE_RULE,$(s))))
+  endif
 endif
 
 ifneq ($(strip $(LIB)),)
@@ -296,6 +299,11 @@ else
 	$(Q)$(LINK) -shared $(SHARED_LDFLAGS) -o $@ $^ $(EXTRA_LDFLAGS)
 endif
 endif
+
+check-collision:
+	@test -z '$(EXE_COLLISION)' || { \
+	  echo "Executable name collision after path flattening: $(EXE_NAMES). Set MAIN_SRCS=... or rename directories." >&2; \
+	  exit 1; }
 
 all: $(TARGETS)
 objs: $(OBJS)

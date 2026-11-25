@@ -106,7 +106,7 @@ The script prints `PASS` / `FAIL` / `SKIP` per case and exits non-zero on failur
 | T15 | `libs/<name>/{include,lib}` auto-discovery |
 | T16 | Empty project does not hang; Windows missing-shell preflight |
 | T17 | Symbolic-link loop (POSIX only) |
-| T18 | Collision renaming; residual collision fails for exe, not static lib |
+| T18 | Collision renaming; residual collision fails for exe, but clean/help/show still work |
 | T19 | Depth-limit warning |
 | T20 | `MAIN_SRCS=` explicit entry-point override |
 | T21 | `CC=$(CXX)` (compile C as C++) |

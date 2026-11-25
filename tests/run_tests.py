@@ -440,6 +440,17 @@ def t18_collision_names():
         write(d / "a_b/main.c", "int main(void){ return 0; }\n")
         write(d / "a/b/main.c", "int main(void){ return 0; }\n")
         write(d / "src/common.c", "int common(void){ return 0; }\n")
+        ok(make(d, "PROGRAM=demo", "clean", env=program_env()),
+           "T18 clean under residual collision")
+        ok(make(d, "PROGRAM=demo", "distclean", env=program_env()),
+           "T18 distclean under residual collision")
+        ok(make(d, "PROGRAM=demo", "help", env=program_env()),
+           "T18 help under residual collision")
+        ok(make(d, "PROGRAM=demo", "show", env=program_env()),
+           "T18 show under residual collision")
+        p = make(d, "PROGRAM=demo", env=program_env())
+        check(p.returncode != 0, "residual collision should fail for default TYPE=auto")
+        check("MAIN_SRCS" in both(p), f"residual collision message lacks MAIN_SRCS:\n{both(p)}")
         ok(make(d, "PROGRAM=demo", "TYPE=static", env=program_env()),
            "T18 TYPE=static should ignore residual exe-name collision")
         check((d / "libdemo.a").exists(), "T18 TYPE=static did not produce a library")
